@@ -1,8 +1,17 @@
 use rand::prelude::*;
-use std::time::SystemTime;
+//use std::time::SystemTime;
 
 fn main() {
-    let start = SystemTime::now();
+    gen_words();
+    gen_words();
+    gen_words();
+    gen_words();
+    gen_words();
+    println!();
+}
+
+fn gen_words() {
+    //let start = SystemTime::now();
 
     let base_vows: Vec<&str> = vec!["a", "e", "i", "o", "u", "y"];
     let base_cons: Vec<&str> = vec![
@@ -55,12 +64,12 @@ fn main() {
         &rnd_fin_cons_2,
     );
 
-    println!(" »");
-    println!();
+    print!(" »");
+    //println!();
 
-    let duration = start.elapsed();
+    //let duration = start.elapsed();
 
-    println!("{duration:?}");
+    //println!("{duration:?}");
 }
 
 fn syll_converter<'a>(
@@ -124,8 +133,6 @@ fn syll_converter<'a>(
         }
     };
 
-    //println!("OG: {rnd_word_defs:?}");
-
     let unvoiced_cons: Vec<&str> = vec!["p", "t", "s", "š", "k", "h"];
     let voiced_cons: Vec<&str> = vec!["m", "b", "n", "d", "z", "r", "l", "ž", "j", "g", "w"];
 
@@ -174,7 +181,7 @@ fn choose_vowel(rnd_base_vow: &str) -> String {
         };
 
         format!("{rnd_base_vow}{rnd_vow_paired}")
-    } else if rnd_base_vow == "a" {
+    } else if rnd_base_vow == "o" {
         vow_pairs = vec![vec![""], vec!["a", "i"]];
 
         rnd_vow_pairing = vow_pairs[rng.random_range(0..=vow_pairs.len() - 1)].clone();
