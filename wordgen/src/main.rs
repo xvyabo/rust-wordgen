@@ -1,6 +1,5 @@
-use std::time::SystemTime;
-
 use rand::prelude::*;
+use std::time::SystemTime;
 
 fn main() {
     let start = SystemTime::now();
@@ -41,8 +40,7 @@ fn main() {
     let rnd_fin_cons_1: String = fin_cons[rng.random_range(0..=fin_cons.len() - 1)].to_string();
     let rnd_fin_cons_2: String = fin_cons[rng.random_range(0..=fin_cons.len() - 1)].to_string();
 
-    let rnd_word: &mut Vec<&str> =
-        &mut poss_word[rng.random_range(0..=poss_word.len() - 1)].clone();
+    let rnd_word: Vec<&str> = poss_word[rng.random_range(0..=poss_word.len() - 1)].clone();
 
     println!();
     print!("« ");
@@ -66,7 +64,7 @@ fn main() {
 }
 
 fn syll_converter<'a>(
-    rnd_word: &'a mut Vec<&'a str>,
+    rnd_word: Vec<&'a str>,
     init_cons_1: &'a String,
     vow_1: &'a String,
     fin_cons_1: &'a String,
@@ -74,30 +72,88 @@ fn syll_converter<'a>(
     vow_2: &'a String,
     fin_cons_2: &'a String,
 ) {
-    for x in 0..rnd_word.len() {
-        if rnd_word[x] == String::from("I") {
-            rnd_word[x] = init_cons_1;
-        } else if rnd_word[x] == String::from("V") {
-            rnd_word[x] = &vow_1;
-        } else if rnd_word[x] == String::from("F") {
-            rnd_word[x] = fin_cons_1;
-        } else if rnd_word[x] == String::from("E") {
-            rnd_word[x] = &init_cons_2;
-        } else if rnd_word[x] == String::from("S") {
-            rnd_word[x] = &vow_2;
-        } else if rnd_word[x] == String::from("C") {
-            rnd_word[x] = fin_cons_2;
+    let mut rnd_word_defs = vec![];
+
+    for x in rnd_word {
+        if x == "I" {
+            let i_def = vec!["I", init_cons_1];
+            rnd_word_defs.push(i_def);
+        } else if x == "V" {
+            let v_def = vec!["V", vow_1];
+            rnd_word_defs.push(v_def);
+        } else if x == "F" {
+            let f_def = vec!["F", fin_cons_1];
+            rnd_word_defs.push(f_def);
+        } else if x == "E" {
+            let e_def = vec!["E", init_cons_2];
+            rnd_word_defs.push(e_def);
+        } else if x == "S" {
+            let s_def = vec!["S", vow_2];
+            rnd_word_defs.push(s_def);
+        } else if x == "C" {
+            let c_def = vec!["C", fin_cons_2];
+            rnd_word_defs.push(c_def);
         }
     }
 
-    /* if rnd_word[0].chars().nth(1) == Some('j') {
-        println!("{}", "EW")
-    }
-    */
+    let mut f_counter = 0;
+    let f_index = loop {
+        f_counter += 1;
+        if rnd_word_defs[f_counter - 1].iter().any(|&f| f == "F") {
+            break (rnd_word_defs
+                .iter()
+                .position(|i| i == &rnd_word_defs[f_counter - 1]))
+            .unwrap();
+        }
+        if f_counter == rnd_word_defs.len() {
+            break 0;
+        }
+    };
 
-    for y in rnd_word {
-        print!("{y}");
+    let mut e_counter = 0;
+    let e_index = loop {
+        e_counter += 1;
+        if rnd_word_defs[e_counter - 1].iter().any(|&e| e == "E") {
+            break (rnd_word_defs
+                .iter()
+                .position(|i| i == &rnd_word_defs[e_counter - 1]))
+            .unwrap();
+        }
+        if e_counter == rnd_word_defs.len() {
+            break 0;
+        }
+    };
+
+    //println!("OG: {rnd_word_defs:?}");
+
+    let unvoiced_cons: Vec<&str> = vec!["p", "t", "s", "š", "k", "h"];
+    let voiced_cons: Vec<&str> = vec!["m", "b", "n", "d", "z", "r", "l", "ž", "j", "g", "w"];
+
+    if f_index > 0 && e_index > 0 {
+        let f_def = rnd_word_defs[f_index][1];
+        let e_def = rnd_word_defs[e_index][1];
+        if f_def == e_def
+            || (unvoiced_cons.iter().any(|&w| w == f_def)
+                && voiced_cons
+                    .iter()
+                    .any(|&w| w == e_def.chars().nth(0).unwrap().to_string().as_str()))
+            || (voiced_cons.iter().any(|&w| w == f_def)
+                && unvoiced_cons
+                    .iter()
+                    .any(|&w| w == e_def.chars().nth(0).unwrap().to_string().as_str()))
+            || (f_def == "n" && e_def == "m")
+            || (f_def == "m" && e_def == "n")
+            || (f_def == "l" && e_def == "r")
+            || (f_def == "r" && e_def == "l")
+        {
+            rnd_word_defs.remove(f_index);
+        }
     }
+
+    for c in rnd_word_defs {
+        print!("{}", c[1]);
+    }
+    // println!("{rnd_word_defs:?}");
 }
 
 fn choose_vowel(rnd_base_vow: &str) -> String {
